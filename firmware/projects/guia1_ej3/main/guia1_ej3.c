@@ -119,7 +119,7 @@
 	 my_leds.mode = TOGGLE;
 	 my_leds.n_led = 3;
 	 my_leds.n_ciclos = 15;
-	 my_leds.periodo = 500;
+	 my_leds.periodo = 250;
  
 	 Funcion_prueba(&my_leds);
  }
