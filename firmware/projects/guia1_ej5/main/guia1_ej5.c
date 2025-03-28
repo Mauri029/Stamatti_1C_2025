@@ -59,16 +59,16 @@ void config_gpio(gpioConf_t *gpio, uint8_t bcd_number)
 	}
 }
 
-void Grafica_bcd(uint32_t datos, uint8_t digitos_salida, gpioConf_t *gpio_1, gpioConf_t *gpio_2)
+void Grafica_bcd(uint32_t datos, uint8_t digitos_salida, gpioConf_t *gpio_selector_pantalla, gpioConf_t *gpio_bcd)
 {
 	uint8_t numero_por_partes[3] = {0};
 	convertToBcdArray(datos, digitos_salida, &numero_por_partes[0]);
 
 	for (int i = 0; i < 3; i++)
 	{
-		config_gpio(gpio_2, numero_por_partes[i]);
-		GPIOOn(gpio_1[i].pin);
-		GPIOOff(gpio_1[i].pin);
+		config_gpio(gpio_bcd, numero_por_partes[i]);
+		GPIOOn(gpio_selector_pantalla[i].pin);
+		GPIOOff(gpio_selector_pantalla[i].pin);
 	}
 }
 
@@ -76,7 +76,7 @@ void app_main(void)
 {
 
 	uint8_t bcd_numer[5] = {0};
-	gpioConf_t gpio[4] =
+	gpioConf_t gpio_bcd[4] =
 		{
 			{GPIO_20, GPIO_OUTPUT},
 			{GPIO_21, GPIO_OUTPUT},
@@ -85,10 +85,10 @@ void app_main(void)
 
 	for (int i = 0; i < 4; i++)
 	{
-		GPIOInit(gpio[i].pin, gpio[i].dir);
+		GPIOInit(gpio_bcd[i].pin, gpio_bcd[i].dir);
 	}
 
-	gpioConf_t gpio_pantalla[3] =
+	gpioConf_t gpio_selector_pantalla[3] =
 		{
 			{GPIO_19, GPIO_OUTPUT},
 			{GPIO_18, GPIO_OUTPUT},
@@ -96,11 +96,11 @@ void app_main(void)
 
 	for (int i = 0; i < 3; i++)
 	{
-		GPIOInit(gpio_pantalla[i].pin, gpio_pantalla[i].dir);
+		GPIOInit(gpio_selector_pantalla[i].pin, gpio_selector_pantalla[i].dir);
 	}
 
 	// convertToBcdArray(123, 3, &bcd_numer[0]);
-	Grafica_bcd(69, 3, &gpio_pantalla[0], &gpio[0]);
+	Grafica_bcd(69, 3, &gpio_selector_pantalla[0], &gpio_bcd[0]);
 
 	printf("BCD: %d %d %d\n", bcd_numer[0], bcd_numer[1], bcd_numer[2]);
 }
