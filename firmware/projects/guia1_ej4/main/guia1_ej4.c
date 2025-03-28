@@ -27,8 +27,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <array>
-#include <cstdint>
 using namespace std;
 
 array <uint8_t, 31> bcd_number;
