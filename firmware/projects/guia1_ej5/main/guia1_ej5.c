@@ -2,15 +2,26 @@
  *
  * @section genDesc General Description
  *
- * This section describes how the program works.
- *
- * <a href="https://drive.google.com/...">Operation Example</a>
+ * El programa recibe un numero cualquiera luego separa cada uno de los digitos y los convierte a BCD. 
+ * Para luego graficarlos en la pantalla lcd de 3 digitos.
+ * 
  *
  * @section hardConn Hardware Connection
  *
- * |    Peripheral  |   ESP32   	|
- * |:--------------:|:--------------|
- * | 	PIN_X	 	| 	GPIO_X		|
+ * \brief Driver for using the 3 digits numeric display in ESP-EDU.
+ *
+ * |   Display      |   EDU-CIAA	|
+ * |:--------------:|:-------------:|
+ * | 	Vcc 	    |	5V      	|
+ * | 	BCD1		| 	GPIO_20		|
+ * | 	BCD2	 	| 	GPIO_21		|
+ * | 	BCD3	 	| 	GPIO_22		|
+ * | 	BCD4	 	| 	GPIO_23		|
+ * | 	SEL1	 	| 	GPIO_19		|
+ * | 	SEL2	 	| 	GPIO_18		|
+ * | 	SEL3	 	| 	GPIO_9		|
+ * | 	Gnd 	    | 	GND     	|
+ * 
  *
  *
  * @section changelog Changelog
@@ -28,12 +39,27 @@
 #include <stdint.h>
 #include <gpio_mcu.h>
 
+/**
+ * Este struct representa la configuracion de un pin GPIO
+*/
+
 typedef struct
 {
 	gpio_t pin; /*!< GPIO pin number */
 	io_t dir;	/*!< GPIO direction '0' IN;  '1' OUT*/
 } gpioConf_t;
 
+
+
+ /**
+ * @fn int8_t convertToBcdArray
+ * @brief Convierte un numero a BCD y lo guarda en un arreglo de 4 elementos
+ * @param data numero a convertir a BCD
+ * @param digits numero de digitos a convertir
+ * @param bcd_number puntero a la variable donde se guardara el resultado
+ * @note el resultado se guardara en el arreglo bcd_number de menor a mayor
+ * @return 0 
+ */
 int8_t convertToBcdArray(uint32_t data, uint8_t digits, uint8_t *bcd_number)
 {
 	for (int i = 0; i < digits; i++)
@@ -44,6 +70,12 @@ int8_t convertToBcdArray(uint32_t data, uint8_t digits, uint8_t *bcd_number)
 	return 0;
 }
 
+/**
+ * @fn void config_gpio
+ * @brief Configura los pines GPIO de acuerdo al numero BCD
+ * @param gpio arreglo con los pines a configurar
+ * @param bcd_number numero a convertir a BCD
+ */
 void config_gpio(gpioConf_t *gpio, uint8_t bcd_number)
 {
 	for (int i = 0; i < 4; i++)
@@ -58,6 +90,15 @@ void config_gpio(gpioConf_t *gpio, uint8_t bcd_number)
 		}
 	}
 }
+
+/**
+ *  @fn void Grafica_bcd
+ * @brief Grafica un numero en la pantalla LCD de 3 digitos
+ * @param datos numero a graficar
+ * @param digitos_salida numero de digitos a graficar
+ * @param gpio_selector_pantalla puntero con el cual se selecciona la pantalla a utilizar
+ * @param gpio arreglo con los pines a configurar  
+ */
 
 void Grafica_bcd(uint32_t datos, uint8_t digitos_salida, gpioConf_t *gpio_selector_pantalla, gpioConf_t *gpio_bcd)
 {
@@ -99,8 +140,5 @@ void app_main(void)
 		GPIOInit(gpio_selector_pantalla[i].pin, gpio_selector_pantalla[i].dir);
 	}
 
-	// convertToBcdArray(123, 3, &bcd_numer[0]);
-	Grafica_bcd(69, 3, &gpio_selector_pantalla[0], &gpio_bcd[0]);
-
-	printf("BCD: %d %d %d\n", bcd_numer[0], bcd_numer[1], bcd_numer[2]);
+	Grafica_bcd(420, 3, &gpio_selector_pantalla[0], &gpio_bcd[0]);
 }
