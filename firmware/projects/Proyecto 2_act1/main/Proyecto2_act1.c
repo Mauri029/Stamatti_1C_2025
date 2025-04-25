@@ -2,7 +2,7 @@
  *
  * @section genDesc General Description
  *
- *El programa mide la distancia , prende los led segun la distancia que mida, muestra la distancia en una 
+ *El programa mide la distancia , prende los led segun la distancia que mida, muestra la distancia en una
  * pantalla lcd y prende o apaga la medicion y mantiene el valor en pantalla
  *
  *
@@ -20,7 +20,7 @@
  * | 	SEL2	 	| 	GPIO_18		|
  * | 	SEL3	 	| 	GPIO_9		|
  * | 	Gnd 	    | 	GND     	|
- * 
+ *
  * \brief Driver for reading distance with HC-SR04 module.
  * |   HC_SR04      |   EDU-CIAA	|
  * |:--------------:|:-------------:|
@@ -28,7 +28,7 @@
  * | 	Echo		| 	GPIO_3		|
  * | 	Trig	 	| 	GPIO_2		|
  * | 	Gnd 	    | 	GND     	|
- * 
+ *
  *
  *
  *
@@ -50,12 +50,89 @@
 #include "freertos/task.h"
 #include "led.h"
 #include "hc_sr04.h"
+#include "lcditse0803.h"
+#include "switch.h"
 
+bool on_off_pantalla = true;
+bool hold = false;
+uint16_t distancia;
+uint8_t teclas;
 
+static void Medir_task()
+{
+    while (true)
+    {
 
+        if (on_off_pantalla)
+        {
+            distancia = HcSr04ReadDistanceInCentimeters();
 
+            if (distancia <= 10)
+            {
+                LedOff(LED_1);
+                LedOff(LED_2);
+                LedOff(LED_3);
+            }
+            else if (distancia > 10 && distancia <= 20)
+            {
+                LedOn(LED_1);
+                LedOff(LED_2);
+                LedOff(LED_3);
+            }
+            else if (distancia > 20 && distancia <= 30)
+            {
+                LedOn(LED_1);
+                LedOn(LED_2);
+                LedOff(LED_3);
+            }
+            else
+            {
+                LedOn(LED_1);
+                LedOn(LED_2);
+                LedOn(LED_3);
+            }
+            if (!hold)
+            {
+                LcdItsE0803Write(distancia);
+                
+            }
 
-void app_main(void){
+           
+        } else
+        {
+            LcdItsE0803Off();
+            LedsOffAll();
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
 
+static void Teclas_task()
+{
+    while (true)
+    {
+        teclas = SwitchesRead();
+        switch (teclas)
+        {
+        case SWITCH_1:
+            on_off_pantalla = !on_off_pantalla;
+            break;
+        case SWITCH_2:
+            hold = !hold;
+
+            break;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+void app_main(void)
+{
+    HcSr04Init(GPIO_3, GPIO_2);
+    LcdItsE0803Init();
+    LedsInit();
+    SwitchesInit();
+    xTaskCreate(&Medir_task, "Medir", 2048, NULL, 1, NULL);
+    xTaskCreate(Teclas_task, "Teclas", 2048, NULL, 1, NULL);
 }
 /*==================[end of file]============================================*/
