@@ -67,7 +67,7 @@ static void Medir_task()
 {
 	while (true)
 	{
-		//ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 		if (on_off_pantalla)
 		{
 			distancia = HcSr04ReadDistanceInCentimeters();
@@ -141,7 +141,7 @@ void app_main(void)
 
 	SwitchActivInt(SWITCH_1, On_off_pantalla, NULL);
 	SwitchActivInt(SWITCH_2, Hold, NULL);
-	xTaskCreate(&Medir_task, "Medir", 2048, NULL, 1, NULL);
+	xTaskCreate(&Medir_task, "Medir", 2048, NULL, 5, &Medir_task_handle);
 	TimerStart(timer_led_1.timer);
 }
 /*==================[end of file]============================================*/
