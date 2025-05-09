@@ -63,7 +63,6 @@ uint8_t teclas;
 
 /*==================[internal data definition]===============================*/
 TaskHandle_t Medir_task_handle = NULL;
-TaskHandle_t uart_task_handle = NULL;
 /*==================[internal functions declaration]=========================*/
 static void Medir_task()
 {
@@ -109,12 +108,10 @@ static void Medir_task()
 			LedsOffAll();
 		}
 
-		UartSendString(UART_PC,(char*)UartItoa(distancia, 10));
-		UartSendString(UART_PC,"  cm\n\r");
-
+		UartSendString(UART_PC, (char *)UartItoa(distancia, 10));
+		UartSendString(UART_PC, "  cm\n\r");
 	}
 }
-
 
 void On_off_pantalla()
 {
@@ -130,6 +127,22 @@ void FuncTimerA(void *param)
 {
 	vTaskNotifyGiveFromISR(Medir_task_handle, pdFALSE);
 }
+
+void Func_Uart_teclas(void *param)
+{
+	uint8_t tecla;
+	UartReadByte(UART_PC, &tecla);
+
+	if (tecla == 'h')
+	{
+		Hold();
+	}
+
+	else if (tecla == 'o')
+	{
+		On_off_pantalla();
+	}
+}
 /*==================[external functions definition]==========================*/
 void app_main(void)
 {
@@ -142,15 +155,14 @@ void app_main(void)
 		.timer = TIMER_A,
 		.period = 1000000,
 		.func_p = FuncTimerA,
-		.param_p = NULL
-	};
+		.param_p = NULL};
 
 	TimerInit(&timer_led_1);
 
 	serial_config_t my_uart = {
 		.baud_rate = 9600,
 		.port = UART_PC,
-		.func_p = NULL,
+		.func_p = Func_Uart_teclas,
 		.param_p = NULL,
 	};
 	UartInit(&my_uart);
