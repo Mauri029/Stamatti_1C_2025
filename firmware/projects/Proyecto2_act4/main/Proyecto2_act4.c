@@ -86,7 +86,7 @@ void leer_ecg()
 		ecg = ECG[i];
 		AnalogOutputWrite(ecg);
 		i++;
-		if (i == 256)//sizeof(ECG))
+		if (i == sizeof(ECG))
 			i = 0;
 	}
 }
