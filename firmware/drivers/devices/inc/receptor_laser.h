@@ -1,5 +1,5 @@
-#ifndef RECEPTOR-LASER_H
-#define RECEPTOR-LASER_H
+#ifndef RECEPTOR_LASER_H
+#define RECEPTOR_LASER_H
 /** \addtogroup Drivers_Programable Drivers Programable
  ** @{ */
 /** \addtogroup Drivers_Devices Drivers devices
@@ -24,6 +24,8 @@
 /*==================[inclusions]=============================================*/
 #include <stdbool.h>
 #include <stdint.h>
+#include "gpio_mcu.h"
+
 /*==================[macros]=================================================*/
 
 /*==================[typedef]================================================*/

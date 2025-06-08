@@ -13,7 +13,7 @@
 #include "receptor_laser.h"
 #include "gpio_mcu.h"
 /*==================[macros and definitions]=================================*/
-gpio_t Laser_GPIO
+gpio_t Laser_GPIO;
     /*==================[internal data declaration]==============================*/
 
     /*==================[internal functions declaration]=========================*/
