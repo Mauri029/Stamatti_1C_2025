@@ -44,6 +44,15 @@
         },
         {
             "path": "projects/Proyecto_final_programable"
+        },
+        {
+            "path": "projects/ej_parcial_1"
+        },
+        {
+            "path": "projects/ej_parcial_2"
+        },
+        {
+            "path": "projects/programable"
         }
     ],
     "settings": {
@@ -101,7 +110,8 @@
             "i2c_mcu.h": "c",
             "compare": "c",
             "cstdint": "c",
-            "sensor_pir.h": "c"
+            "sensor_pir.h": "c",
+            "esp_bt.h": "c"
         },
     },
     "tasks": {
