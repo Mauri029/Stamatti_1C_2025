@@ -46,59 +46,57 @@
 /*==================[macros and definitions]=================================*/
 
 /*==================[internal data definition]===============================*/
-bool on_off_pantalla = true;
-bool hold = false;
 uint16_t distancia;
 uint8_t teclas;
+bool laser_detected;
 /*==================[internal functions declaration]=========================*/
-
-
 
 static void Medir_task()
 {
     while (true)
     {
-            distancia = HcSr04ReadDistanceInCentimeters();
+        distancia = HcSr04ReadDistanceInCentimeters();
+        LcdItsE0803Write(distancia);
+        laser_detected = Laser_receiverRead();
 
-            if (distancia < 20)
-            {
-                LedOn(LED_1);
-                LedOn(LED_2);
-                LedOn(LED_3);
-			}
-                LcdItsE0803Write(distancia);
-                
-            
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-}
 
-static void Teclas_task()
-{
-    while (true)
-    {
-        teclas = SwitchesRead();
-        switch (teclas)
+
+        if (distancia > 20 && laser_detected)
         {
-        case SWITCH_1:
-            on_off_pantalla = !on_off_pantalla;
-            break;
-        case SWITCH_2:
-            hold = !hold;
-
-            break;
+            LedOn(LED_1);
+            LedOn(LED_2);
+            LedOn(LED_3);
+            UartSendString(UART_PC, ">Alerta: Posible salida no autorizada");
+            UartSendString(UART_PC, "\r\n");
         }
-
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        else
+        {
+            LedOff(LED_1);
+            LedOff(LED_2);
+            LedOff(LED_3);
+            UartSendString(UART_PC, ">Todo normal");
+            UartSendString(UART_PC, "\r\n");
+        }
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
+
 void app_main(void)
 {
     HcSr04Init(GPIO_3, GPIO_2);
+    Laser_receiverPirInit(GPIO_1);
     LcdItsE0803Init();
     LedsInit();
-    SwitchesInit();
-    xTaskCreate(&Medir_task, "Medir", 2048, NULL, 1, NULL);
-    xTaskCreate(Teclas_task, "Teclas", 2048, NULL, 1, NULL);
+
+
+    serial_config_t my_uart = {
+        .baud_rate = 19200,
+        .port = UART_PC,
+        .func_p = NULL,
+        .param_p = NULL,
+    };
+    UartInit(&my_uart);
+
+    xTaskCreate(&Medir_task, "Medir", 4096, NULL, 5, NULL);
 }
 /*==================[end of file]============================================*/
