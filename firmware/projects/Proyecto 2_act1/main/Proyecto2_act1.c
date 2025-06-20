@@ -53,11 +53,22 @@
 #include "lcditse0803.h"
 #include "switch.h"
 
+/*==================[macros and definitions]=================================*/
 bool on_off_pantalla = true;
 bool hold = false;
 uint16_t distancia;
 uint8_t teclas;
 
+/*==================[internal functions definition]==========================*/
+
+/**
+ * @fn static void Medir_task()
+ * @brief Tarea encargada de medir la distancia con el sensor HC-SR04.
+ * @note Enciende LEDs según la distancia y muestra el valor en el display si "hold" no está activado.
+ * Si el sistema está apagado, se apagan todos los LEDs y se apaga el display.
+ * @param None
+ * @return None
+ */
 static void Medir_task()
 {
     while (true)
@@ -106,7 +117,13 @@ static void Medir_task()
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
-
+/**
+ * @fn static void Teclas_task()
+ * @brief Tarea encargada de leer las teclas físicas para controlar el modo de operación.
+ * @note SWITCH_1 alterna entre encender/apagar pantalla y medición. SWITCH_2 activa o desactiva el "hold".
+ * @param None
+ * @return None
+ */
 static void Teclas_task()
 {
     while (true)

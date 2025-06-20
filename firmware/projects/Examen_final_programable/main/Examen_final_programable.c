@@ -199,8 +199,6 @@ static void todo_bien_task()
 /*==================[external functions definition]==========================*/
 void app_main(void)
 {
-
-	
 	analog_input_config_t adc_config = {
 		CH1,		/*!< Inputs: CH0, CH1, CH2, CH3 */
 		ADC_SINGLE, /*!< Mode: single read or continuous read */

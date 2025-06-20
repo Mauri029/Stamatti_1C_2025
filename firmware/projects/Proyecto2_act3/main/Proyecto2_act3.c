@@ -64,6 +64,15 @@ uint8_t teclas;
 /*==================[internal data definition]===============================*/
 TaskHandle_t Medir_task_handle = NULL;
 /*==================[internal functions declaration]=========================*/
+
+/**
+ * @fn static void Medir_task()
+ * @brief Tarea que mide la distancia y toma acciones según el valor leído.
+ * @note Enciende LEDs según la distancia, actualiza el display LCD y transmite el valor por UART.
+ * Si la función "hold" está activa, mantiene el último valor en pantalla.
+ * @param None
+ * @return None
+ */
 static void Medir_task()
 {
 	while (true)
@@ -112,22 +121,47 @@ static void Medir_task()
 		UartSendString(UART_PC, "  cm\n\r");
 	}
 }
-
+/**
+ * @fn void On_off_pantalla()
+ * @brief Alterna el estado de encendido/apagado del display LCD y medición.
+ * @note Asociada a una interrupción por botón físico o UART.
+ * @param None
+ * @return None
+ */
 void On_off_pantalla()
 {
 	on_off_pantalla = !on_off_pantalla;
 }
 
+/**
+ * @fn void Hold()
+ * @brief Alterna el estado de retención del valor en pantalla.
+ * @note Al activarse, evita que el valor actual en el LCD sea actualizado.
+ * @param None
+ * @return None
+ */
 void Hold()
 {
 	hold = !hold;
 }
-
+/**
+ * @fn void FuncTimerA(void *param)
+ * @brief Función asociada a interrupción del temporizador.
+ * @note Notifica a la tarea de medición que debe ejecutarse.
+ * @param param Parámetro no utilizado.
+ * @return None
+ */
 void FuncTimerA(void *param)
 {
 	vTaskNotifyGiveFromISR(Medir_task_handle, pdFALSE);
 }
-
+/**
+ * @fn void Func_Uart_teclas(void *param)
+ * @brief Función que gestiona los comandos recibidos por UART.
+ * @note Permite controlar "hold" y "on/off pantalla" con caracteres desde la terminal.
+ * @param param Parámetro no utilizado.
+ * @return None
+ */
 void Func_Uart_teclas(void *param)
 {
 	uint8_t tecla;

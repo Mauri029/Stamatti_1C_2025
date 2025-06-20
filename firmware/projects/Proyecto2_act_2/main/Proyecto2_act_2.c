@@ -63,6 +63,14 @@ uint8_t teclas;
 /*==================[internal data definition]===============================*/
 TaskHandle_t Medir_task_handle = NULL;
 /*==================[internal functions declaration]=========================*/
+/**
+ * @fn static void Medir_task()
+ * @brief Tarea encargada de medir la distancia mediante el sensor HC-SR04.
+ * @note Según el valor medido, enciende un número determinado de LEDs, actualiza el display LCD (si no está en hold)
+ * y apaga el sistema si está deshabilitado.
+ * @param None
+ * @return None
+ */
 static void Medir_task()
 {
 	while (true)
@@ -108,17 +116,35 @@ static void Medir_task()
 		}
 	}
 }
-
+/**
+ * @fn void On_off_pantalla()
+ * @brief Alterna el estado de encendido/apagado de la medición y el display.
+ * @note Asociada a la interrupción por botón físico (SWITCH_1).
+ * @param None
+ * @return None
+ */
 void On_off_pantalla()
 {
 	on_off_pantalla = !on_off_pantalla;
 }
-
+/**
+ * @fn void Hold()
+ * @brief Alterna el estado de "hold" del display.
+ * @note Si está activado, mantiene el valor actual en pantalla aunque cambie la distancia.
+ * @param None
+ * @return None
+ */
 void Hold()
 {
 	hold = !hold;
 }
-
+/**
+ * @fn void FuncTimerA(void *param)
+ * @brief Función de callback del temporizador.
+ * @note Notifica a la tarea de medición para que se ejecute.
+ * @param param No utilizado.
+ * @return None
+ */
 void FuncTimerA(void *param)
 {
 	vTaskNotifyGiveFromISR(Medir_task_handle, pdFALSE);
